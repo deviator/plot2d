@@ -65,9 +65,12 @@ void main(string[] args)
         ));
     }
 
+    auto cc = new CairoCtx;
+
     da.addOnDraw((Scoped!Context cr, Widget w)
     {
-        plot.draw(cr, Point(w.getAllocatedWidth(),
+        cc.cr = cr;
+        plot.draw(cc, Point(w.getAllocatedWidth(),
                             w.getAllocatedHeight()));
         return false;
     });

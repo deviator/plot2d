@@ -1,7 +1,18 @@
 name "plot2d"
+
 targettype "library"
+description "2d plotting library"
+authors "Oleg Butko (deviator)"
+copyright "Copyright © 2017 Oleg Butko"
+license "MIT"
 
 configuration "gtk" {
     versions "cairo_be"
     dependency "gtk-d:gtkd" version="~>3.6.6"
+}
+
+configuration "dlangui" {
+    versions "dlangui_be"
+    dependency "dlangui" version="~>0.9.120"
+    subConfiguration "dlangui" "minimal"
 }

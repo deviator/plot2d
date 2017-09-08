@@ -70,8 +70,8 @@ class LBGridLabel : Label
         setupStyle(cr);
 
         Point xte, yte;
-        cr.getTextSize(formatter.maxXValue, xte);
-        cr.getTextSize(formatter.maxYValue, yte);
+        cr.getTextSize(formatter.maxXValue, xte.x, xte.y);
+        cr.getTextSize(formatter.maxYValue, yte.x, xte.y);
         return Point(xte.x * 1.2, yte.y * 2.5);
     }
 
@@ -95,7 +95,7 @@ class LBGridLabel : Label
             auto pnt = Point(i, im.h.max + space.y);
             foreach (n, ln; str.split("\n"))
             {
-                cr.getTextSize(ln, te);
+                cr.getTextSize(ln, te.x, te.y);
                 if (n == 0 && (i - te.x/2 < im.w.min ||
                                i + te.x/2 > im.w.max)) break;
                 cr.moveToP(pnt + Point(-te.x/2, te.y));
@@ -110,7 +110,7 @@ class LBGridLabel : Label
             auto pnt = Point(im.w.min - space.x, i);
             foreach (ln; str.split("\n"))
             {
-                cr.getTextSize(ln, te);
+                cr.getTextSize(ln, te.x, te.y);
                 cr.moveToP(pnt + Point(-te.x, te.y/2));
                 cr.showText(ln);
                 pnt.y += fontsize * lineSpacing;
