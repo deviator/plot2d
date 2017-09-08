@@ -42,6 +42,7 @@ public:
         void update()
         {
             super.update();
+            if (buffer.data.length == 0) return;
 
             auto avg_diff = 0.0;
             foreach (a, b; lockstep(buffer.data[0..$-1], buffer.data[1..$]))

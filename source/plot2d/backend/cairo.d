@@ -1,13 +1,16 @@
+///
 module plot2d.backend.cairo;
 
 import plot2d.backend.base;
 
-version (cairo_be):
+version (cairo):
 
-public import cairo.Context;
+import cairo.Context;
 
+///
 class CairoCtx : Ctx
 {
+    /// set this before draw
     Context cr;
 
 override:

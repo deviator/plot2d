@@ -7,12 +7,12 @@ copyright "Copyright © 2017 Oleg Butko"
 license "MIT"
 
 configuration "gtk" {
-    versions "cairo_be"
+    versions "cairo"
     dependency "gtk-d:gtkd" version="~>3.6.6"
 }
 
 configuration "dlangui" {
-    versions "dlangui_be"
+    versions "dlangui"
     dependency "dlangui" version="~>0.9.120"
     subConfiguration "dlangui" "minimal"
 }
