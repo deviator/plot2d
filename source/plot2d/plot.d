@@ -42,7 +42,7 @@ public:
     ///
     Trtor tr;
     /// namespaced style
-    NSStyle st;
+    NSStyle style;
 
     ///
     Axis axis;
@@ -55,68 +55,34 @@ public:
     Chart[] charts;
 
     ///
-    this(Label.Formatter fmter)
+    this()
     {
-        fmter = fmter is null ? new DefaultLabelFormatter : fmter;
-
         tr = new Trtor;
-        st = new NSStyle;
+        style = new NSStyle;
 
-        axis = new LBAxis();
-        grid = new Grid();
+        axis = new LBAxis(style);
+        grid = new Grid(style);
         grid.dash = [5, 8];
-        label = new LBGridLabel(fmter);
-
-        //this.gsc = gsc is null ? new DefaultGridStepCalculator : gsc;
-
-        //st.number.set("label.fontsize", 15);
-        //st.strval.set("label.fontface", "Monospace");
-        //st.color.set("label.color", Color(0,0,0,0.8));
-
-        //st.number.set("axis.linewidth", 1.5);
-        //st.color.set("axis.color", Color(0,0,0,.7));
-
-        //st.number.set("grid.linewidth", 1);
-        //st.color.set("grid.color", Color(0,0,0,.2));
-
-        //st.number.set("linechart.linewidth", 2);
-
-        //st.number.set("trechart.linewidth", 2);
-        //st.number.set("trechart.limlinewidth", 1);
+        label = new LBGridLabel(style);
     }
 
     ///
-    static auto defaultFmtFunc(double value, double step)
+    T add(T)(T ch) if (is(T : Chart))
     {
-        import std.string;
-        auto sf = format("%f", step).tr("0", " ").strip.split(".");
-        return format("%.*f", sf[1].length, value);
+        charts ~= ch;
+        if (auto sch = cast(Stylized)ch)
+            sch.setRootStyle(style);
+        return ch;
     }
 
-    static class DefaultLabelFormatter : Label.Formatter
+    ///
+    void updateCharts()
     {
-        string maxX = "0.0", maxY = "0.0";
-    override:
-        string x(double v, double s)
-        {
-            auto r = defaultFmtFunc(v, s);
-            if (r.length > maxX.length) maxX = r;
-            return r;
-        }
-
-        string y(double v, double s)
-        {
-            auto r = defaultFmtFunc(v, s);
-            if (r.length > maxY.length) maxY = r;
-            return r;
-        }
-
-        string maxXValue() @property { return maxX; }
-        string maxYValue() @property { return maxY; }
+        foreach (c; charts)
+            c.update();
     }
 
-    void update() { foreach (c; charts) c.update(); }
-
+    ///
     void draw(Ctx cr, Point size)
     {
         if (recalculateTrtor(cr, size)) return;
@@ -134,7 +100,7 @@ protected:
         Point lmgs;
         {
             mixin(scopeSave!cr);
-            lmgs = label.minGridStep(cr, st);
+            lmgs = label.minGridStep(cr);
         }
 
         tr.optimizeGridStep(
@@ -149,7 +115,7 @@ protected:
             return 1;
         }
 
-        correctGridOffset();
+        tr.correctGridOffset();
         return 0;
     }
 
@@ -178,21 +144,6 @@ protected:
         return ret;
     }
 
-    void correctGridOffset()
-    {
-        auto im = tr.inMargin;
-        auto gs = tr.gridStep;
-        auto s = tr.scale;
-
-        auto orig = Point(im.w.min, im.h.max);
-        auto p0 = tr.toCh(orig);
-        auto chgs = gs / s;
-        p0 = Point(p0.x.quantize!ceil(chgs.x),
-                   p0.y.quantize!ceil(-chgs.y));
-        auto r = tr.toDA(p0) - orig;
-        tr.gridOffset = Point(r.x, -r.y);
-    }
-
     void drawElements(Ctx cr)
     {
         foreach (p; chain(only(cast(Drawable)axis,
@@ -202,7 +153,9 @@ protected:
         {
             if (p is null) continue;
             mixin(scopeSave!cr);
-            p.draw(cr, tr, st);
+            if (auto c = cast(Chart)p)
+                if (!c.visible) continue;
+            p.draw(cr, tr);
         }
     }
 }

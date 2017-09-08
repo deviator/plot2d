@@ -118,6 +118,19 @@ public:
     }
 
     ///
+    void correctGridOffset()
+    {
+        auto im = inMargin;
+        auto orig = Point(im.w.min, im.h.max);
+        auto p0 = toCh(orig);
+        auto chgs = _gridStep / _scale;
+        p0 = Point(p0.x.quantize!ceil(chgs.x),
+                   p0.y.quantize!ceil(-chgs.y));
+        auto r = toDA(p0) - orig;
+        _gridOffset = Point(r.x, -r.y);
+    }
+
+    ///
     void optimizeGridStep(Point minGridCellSize)
     {
         double cs(double m, double delegate(double) stepper)

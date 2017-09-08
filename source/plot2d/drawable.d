@@ -15,5 +15,5 @@ public
 interface Drawable
 {
     ///
-    void draw(Ctx, Trtor, Style);
+    void draw(Ctx, Trtor);
 }

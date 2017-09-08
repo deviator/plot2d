@@ -1,35 +1,47 @@
+///
 module plot2d.axis;
 
 import plot2d.drawable;
 
-class Axis : Drawable
+///
+class Axis : Drawable, Stylized
 {
+    mixin StylizedHelper!"axis";
+
     bool vertical = true;
     bool horisontal = true;
 
     double[] dash = [];
     double dashOffset = 0.0;
 
-    override void draw(Ctx cr, Trtor tr, Style st)
+    ///
+    this(Style root) { setRootStyle(root); }
+
+    override void draw(Ctx cr, Trtor tr)
     {
-        setupStyle(cr, st);
-        drawLines(cr, tr, st);
+        setupStyle(cr);
+        drawLines(cr, tr);
         cr.stroke();
     }
 
-    void setupStyle(Ctx cr, Style style)
+    ///
+    void setupStyle(Ctx cr)
     {
         cr.setLineWidth(style.number.get("linewidth", 1));
         cr.setColor(style.color.get("color", Color.mono(0, 0.8)));
         cr.setDash(dash, dashOffset);
     }
 
-    abstract void drawLines(Ctx, Trtor, Style);
+    abstract void drawLines(Ctx, Trtor);
 }
 
+///
 class LBAxis : Axis
 {
-    override void drawLines(Ctx cr, Trtor tr, Style style)
+    ///
+    this(Style root) { super(root); }
+
+    override void drawLines(Ctx cr, Trtor tr)
     {
         auto im = tr.inMargin;
 
@@ -38,9 +50,13 @@ class LBAxis : Axis
     }
 }
 
+///
 class ZeroAxis : Axis
 {
-    override void drawLines(Ctx cr, Trtor tr, Style style)
+    ///
+    this(Style root) { super(root); }
+
+    override void drawLines(Ctx cr, Trtor tr)
     {
         auto im = tr.inMargin;
         auto z = tr.toDA(0,0);
@@ -49,9 +65,15 @@ class ZeroAxis : Axis
     }
 }
 
+///
 class Grid : Axis
 {
-    override void drawLines(Ctx cr, Trtor tr, Style style)
+    ///
+    this(Style root) { super(root); }
+
+    override string styleName() @property { return "grid"; }
+
+    override void drawLines(Ctx cr, Trtor tr)
     {
         auto im = tr.inMargin;
         auto s = tr.gridStep;

@@ -6,7 +6,7 @@ public import plot2d.chart.base;
 class TreChart : BaseChart!TreStat
 {
 protected:
-    override void expandViewport(size_t i, ref const TreStat val)
+    override void expandViewport(size_t i, ref const Elem val)
     {
         if (i == 0) vp = Viewport.initial(val.minPnt);
         else
@@ -27,7 +27,7 @@ public:
     this(Color stroke,
          Color strokeLimUp, Color fillUp,
          Color strokeLimDown, Color fillDown,
-         void delegate(ref typeof(buffer)) fd)
+         BufferFiller fd)
     {
         this.stroke = stroke;
         this.fillUp = fillUp;
@@ -50,7 +50,7 @@ public:
             disaster = avg_diff * disasterCoef;
         }
 
-        void draw(Ctx cr, Trtor tr, Style style)
+        void draw(Ctx cr, Trtor tr)
         {
             auto limlinewidth = style.number.get("limlinewidth", 1);
             auto linewidth = style.number.get("linewidth", 2);

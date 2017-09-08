@@ -6,7 +6,7 @@ import plot2d.chart.base;
 class LineChart : BaseChart!Point
 {
 protected:
-    override void expandViewport(size_t i, ref const Point val)
+    override void expandViewport(size_t i, ref const Elem val)
     {
         if (i == 0) vp = Viewport.initial(val);
         else vp.expand(val);
@@ -21,13 +21,13 @@ public:
     double dashOffset = 0;
 
     ///
-    this(Color stroke, void delegate(ref Appender!(Point[])) fd)
+    this(Color stroke, BufferFiller fd)
     {
         this.stroke = stroke;
         super(fd);
     }
 
-    override void draw(Ctx cr, Trtor tr, Style style)
+    override void draw(Ctx cr, Trtor tr)
     {
         if (buffer.data.length == 0) return;
 

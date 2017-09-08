@@ -36,6 +36,48 @@ interface Style
 }
 
 ///
+interface Stylized
+{
+    /// get sub style from root and set style
+    final void setRootStyle(Style root)
+    { setStyle(root.getSubstyle(styleName)); }
+    ///
+    void setStyle(Style);
+
+    @property
+    {
+        ///
+        string styleName();
+        ///
+        Style style();
+    }
+
+    ///
+    mixin template StylizedHelper(string NAME="")
+    {
+        import std.exception : enforce;
+
+        protected Style __style;
+        public override
+        {
+            void setStyle(Style s)
+            { __style = enforce(s, "style is null"); }
+
+            @property
+            {
+                string styleName() { return NAME; }
+                Style style()
+                {
+                    if (__style is null)
+                        __style = new PlainStyle(null);
+                    return __style;
+                }
+            }
+        }
+    }
+}
+
+///
 class PlainStyle : Style
 {
 protected:

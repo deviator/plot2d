@@ -3,7 +3,7 @@ module plot2d.label;
 import std.exception : enforce;
 import plot2d.drawable;
 
-interface Label : Drawable
+interface Label : Drawable, Stylized
 {
     static interface Formatter
     {
@@ -13,11 +13,44 @@ interface Label : Drawable
         string y(double value, double step);
         string maxYValue() @property;
     }
+
+    ///
+    static auto defaultFmtFunc(double value, double step)
+    {
+        import std.string;
+        auto sf = format("%f", step).tr("0", " ").strip.split(".");
+        return format("%.*f", sf[1].length, value);
+    }
+
+    ///
+    static class DefaultFormatter : Formatter
+    {
+        string maxX = "0.0", maxY = "0.0";
+    override:
+        string x(double v, double s)
+        {
+            auto r = defaultFmtFunc(v, s);
+            if (r.length > maxX.length) maxX = r;
+            return r;
+        }
+
+        string y(double v, double s)
+        {
+            auto r = defaultFmtFunc(v, s);
+            if (r.length > maxY.length) maxY = r;
+            return r;
+        }
+
+        string maxXValue() @property { return maxX; }
+        string maxYValue() @property { return maxY; }
+    }
 }
 
 class LBGridLabel : Label
 {
-    Formatter fmt;
+    mixin StylizedHelper!"label";
+
+    Formatter formatter;
 
     double lineSpacing = 1.5;
 
@@ -26,24 +59,25 @@ class LBGridLabel : Label
 
     Point space = Point(8, 8);
 
-    this(Formatter fmt)
+    this(Style root, Formatter fmt=null)
     {
-        this.fmt = enforce(fmt, "formatter is null");
+        setRootStyle(root);
+        formatter = fmt is null ? new DefaultFormatter : fmt;
     }
 
-    Point minGridStep(Ctx cr, Style style)
+    Point minGridStep(Ctx cr)
     {
-        setupStyle(cr, style);
+        setupStyle(cr);
 
         Point xte, yte;
-        cr.getTextSize(fmt.maxXValue, xte);
-        cr.getTextSize(fmt.maxYValue, yte);
+        cr.getTextSize(formatter.maxXValue, xte);
+        cr.getTextSize(formatter.maxYValue, yte);
         return Point(xte.x * 1.2, yte.y * 2.5);
     }
 
-    override void draw(Ctx cr, Trtor tr, Style style)
+    override void draw(Ctx cr, Trtor tr)
     {
-        setupStyle(cr, style);
+        setupStyle(cr);
 
         auto fontsize = style.number.get("fontsize", 15);
 
@@ -57,7 +91,7 @@ class LBGridLabel : Label
 
         if (onX) for (double i = im.w.min + o.x; i <= im.w.max; i += s.x)
         {
-            auto str = fmt.x(tr.toChX(i), chs.x);
+            auto str = formatter.x(tr.toChX(i), chs.x);
             auto pnt = Point(i, im.h.max + space.y);
             foreach (n, ln; str.split("\n"))
             {
@@ -72,7 +106,7 @@ class LBGridLabel : Label
 
         if (onY) for (double i = im.h.max - o.y; i > im.h.min; i -= s.y)
         {
-            auto str = fmt.y(tr.toChY(i), chs.y);
+            auto str = formatter.y(tr.toChY(i), chs.y);
             auto pnt = Point(im.w.min - space.x, i);
             foreach (ln; str.split("\n"))
             {
@@ -84,7 +118,7 @@ class LBGridLabel : Label
         }
     }
 
-    void setupStyle(Ctx cr, Style style)
+    void setupStyle(Ctx cr)
     {
         cr.setFont(style.strval.get("fontface", "Monospace"),
                    style.number.get("fontsize", 15));

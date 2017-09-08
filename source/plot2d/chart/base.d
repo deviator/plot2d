@@ -19,26 +19,29 @@ interface Chart : Drawable
 }
 
 ///
-class BaseChart(T) : Chart
+class BaseChart(T) : Chart, Stylized
 {
+    mixin StylizedHelper;
 protected:
     ///
     Viewport vp;
 
-    Appender!(T[]) buffer;
-    void delegate(ref Appender!(T[])) fillData;
+    Appender!(Elem[]) buffer;
+    BufferFiller fillData;
 
-    void expandViewport(size_t i, ref const T val);
+    void expandViewport(size_t i, ref const Elem val);
 
 public:
 
-    this(void delegate(ref Appender!(T[])) fillData)
-    { this.fillData = fillData; }
+    alias Elem = T;
+    alias BufferFiller = void delegate(ref Appender!(Elem[]));
 
-    override 
+    this(BufferFiller fillData) { this.fillData = fillData; }
+
+    override const @property
     {
-        bool visible() const @property { return !buffer.data.empty; }
-        ref const(Viewport) viewport() const @property { return vp; }
+        bool visible() { return !buffer.data.empty; }
+        ref const(Viewport) viewport() { return vp; }
     }
 
     ///
@@ -60,5 +63,5 @@ public:
     }
 
     ///
-    abstract void draw(Ctx cr, Trtor tr, Style st);
+    abstract void draw(Ctx cr, Trtor tr);
 }

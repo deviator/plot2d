@@ -10,6 +10,8 @@ import plot2d;
 version = with_tre;
 version = fix_viewport;
 
+bool interactive = true;
+
 void main(string[] args)
 {
     Main.init(args);
@@ -17,7 +19,7 @@ void main(string[] args)
     auto win = new Window("example");
     auto da = new DrawingArea();
 
-    auto plot = new Plot(null);
+    auto plot = new Plot;
 
     import std.math : sin;
     import std.range : iota;
@@ -51,7 +53,7 @@ void main(string[] args)
         auto tre = iota(-2, 2.02, 0.02).map!(i=>TreStat(i, sin(i*sin(i+ct()*0.5)*PI*2) + 0.4 + sin(i*PI*2+ct*3) * 0.3,
                                                         sin(i*sin(i+ct()*0.5)*PI*2),
                                                         sin(i*sin(i+ct()*0.5)*PI*2) - 0.4 - sin(i*PI*2+ct*5) * 0.3));
-        plot.charts ~= new TreChart(
+        plot.add(new TreChart(
             Color(0,0.5,0,0.8),
 
             Color(1,1,0,.3),
@@ -60,7 +62,7 @@ void main(string[] args)
             Color(0,1,1,.3),
             Color(0,1,1,.2),
             (ref Appender!(TreStat[]) buf) { buf.put(tre.save); }
-        );
+        ));
     }
 
     da.addOnDraw((Scoped!Context cr, Widget w)
@@ -76,8 +78,11 @@ void main(string[] args)
 
     import glib.Idle;
     auto idle = new Idle({
-        plot.update();
-        da.queueDraw();
+        if (interactive)
+        {
+            plot.updateCharts();
+            da.queueDraw();
+        }
         return true;
     }, true);
     win.addOnHide((w){ Main.quit(); });
