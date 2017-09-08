@@ -1,0 +1,7 @@
+name "plot2d"
+targettype "library"
+
+configuration "gtk" {
+    versions "cairo_be"
+    dependency "gtk-d:gtkd" version="~>3.6.6"
+}

@@ -1,0 +1,7 @@
+name "example"
+targetType "executable"
+
+sourceFiles "app.d"
+
+dependency "plot2d" path="../.."
+subConfiguration "plot2d" "gtk"
