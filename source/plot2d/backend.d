@@ -14,13 +14,13 @@ version (cairo_be)
 
     void clipViewport(Ctx cr, Viewport vp)
     {
-        //cr.moveTo(vp.w.min, vp.h.min);
-        //cr.lineTo(vp.w.max, vp.h.min);
-        //cr.lineTo(vp.w.max, vp.h.max);
-        //cr.lineTo(vp.w.min, vp.h.max);
-        //cr.lineTo(vp.w.min, vp.h.min);
-        //cr.clip();
-        //cr.newPath();
+        cr.moveTo(vp.w.min, vp.h.min);
+        cr.lineTo(vp.w.max, vp.h.min);
+        cr.lineTo(vp.w.max, vp.h.max);
+        cr.lineTo(vp.w.min, vp.h.max);
+        cr.lineTo(vp.w.min, vp.h.min);
+        cr.clip();
+        cr.newPath();
     }
 
     void getTextSize(Ctx cr, string str, ref Point ret)

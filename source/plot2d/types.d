@@ -35,6 +35,9 @@ struct Viewport
     ///
     DimSeg w, h;
 
+    static Viewport initial()(auto ref const Point v)
+    { return Viewport(DimSeg(v.x, v.x), DimSeg(v.y, v.y)); }
+
     ///
     void expand()(auto ref const Point p)
     {
