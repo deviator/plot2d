@@ -50,9 +50,10 @@ void main(string[] args)
 
     version (with_tre)
     {
-        auto tre = iota(-2, 2.02, 0.02).map!(i=>TreStat(i, sin(i*sin(i+ct()*0.5)*PI*2) + 0.4 + sin(i*PI*2+ct*3) * 0.3,
-                                                        sin(i*sin(i+ct()*0.5)*PI*2),
-                                                        sin(i*sin(i+ct()*0.5)*PI*2) - 0.4 - sin(i*PI*2+ct*5) * 0.3));
+        auto mf(float i) { return sin(i*sin(i+ct()*0.5)*PI*2); }
+        auto tre = iota(-2, 2.02, 0.02)
+            .map!(i=>TreStat(i, mf(i) + 0.4 + sin(i*PI*2+ct*3) * 0.3,
+                            mf(i), mf(i) - 0.4 - sin(i*PI*2+ct*5) * 0.3));
         plot.add(new TreChart(
             Color(0,0.5,0,0.8),
 
