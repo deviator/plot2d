@@ -11,7 +11,7 @@ auto ct()
     return Clock.currStdTime / 1e7;
 }
 
-class PlotWidget : Widget
+class PlotWidget : CanvasWidget
 {
     Plot plot;
     DlangUICtx ctx;
@@ -38,9 +38,8 @@ class PlotWidget : Widget
         ));
     }
 
-    override void onDraw(DrawBuf buf)
+    override void doDraw(DrawBuf buf, Rect rc)
     {
-        super.onDraw(buf);
         auto _ = ctx.set(buf);
         plot.draw(ctx, PPoint(this.width, this.height));
     }
