@@ -41,8 +41,7 @@ class PlotWidget : Widget
     override void onDraw(DrawBuf buf)
     {
         super.onDraw(buf);
-        ctx.buf = buf;
-
+        auto _ = ctx.set(buf);
         plot.draw(ctx, PPoint(this.width, this.height));
     }
 }
