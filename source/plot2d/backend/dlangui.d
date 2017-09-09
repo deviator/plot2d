@@ -12,18 +12,21 @@ alias PPoint = plot2d.Point;
 alias PColor = plot2d.Color;
 
 alias UIPoint = dlangui.PointF;
+alias UIPointI = dlangui.Point;
 alias UIColor = dlangui.Color;
 
 UIPoint toUI()(auto ref const PPoint p)
 { return UIPoint(p.x, p.y); }
 
+UIPointI toUII()(auto ref const PPoint p)
+{ return UIPointI(cast(int)p.x, cast(int)p.y); }
+
 uint toUI()(auto ref const PColor c)
 {
-    return (cast(uint)c.r*255)<<16 &
-           (cast(uint)c.g*255)<<8 &
-           (cast(uint)c.b*255)<<0;
+    return (cast(uint)(c.r*255))<<16 |
+           (cast(uint)(c.g*255))<<8 |
+           (cast(uint)(c.b*255));
 }
-
 
 import std.array;
 import std.typecons : Tuple;
@@ -53,7 +56,7 @@ protected:
     {
         //buf.resetClipping();
         //buf.clipRect = state.clip;
-        //buf.alpha = cast(uint)(state.color.a * 255);
+        buf.alpha = cast(uint)(state.color.a * 255);
     }
 
     void reset()
@@ -70,6 +73,38 @@ protected:
     }
 
     DrawBuf buf;
+
+    void drawLine(PPoint a, PPoint b, int c)
+    { buf.drawLine(a.toUII, b.toUII, c); }
+
+    void fillTriangle(PPoint p0, PPoint p1, PPoint p2, int clr)
+    {
+        import std.algorithm : sort;
+        auto p = [p0, p1, p2].sort!"a.x < b.x";
+        
+        auto d1 = cast(int)(p[1].x - p[0].x);
+        auto d2 = cast(int)(p[2].x - p[1].x);
+        auto d3 = p[2].x - p[0].x;
+
+        foreach (i; 0 .. d1+1)
+        {
+            auto fa = i/cast(float)d1;
+            auto a = (p[0] * (1-fa) + p[1] * fa);
+            auto fb = (a.x - p[0].x) / d3;
+            auto b = (p[0] * (1-fb) + p[2] * fb);
+            drawLine(a, b, clr);
+        }
+
+        foreach (i; 0 .. d2+1)
+        {
+            auto fa = i/cast(float)d2;
+            auto a = (p[1] * (1-fa) + p[2] * fa);
+            auto fb = (a.x - p[0].x) / d3;
+            auto b = (p[0] * (1-fb) + p[2] * fb);
+            drawLine(a, b, clr);
+        }
+
+    }
 
 public:
 
@@ -97,17 +132,18 @@ override:
 
     void stroke()
     {
-        buf.alpha = cast(uint)(state.color.a * 255);
+        setCurrentState();
+        auto clr = state.color.toUI;
         foreach (ln; state.lines.data)
         {
-            foreach (int i; 0 .. cast(int)state.lineWidth)
-            buf.drawLine(
-                dlangui.Point(cast(int)ln[0].x+i,
-                              cast(int)ln[0].y+i),
-                dlangui.Point(cast(int)ln[1].x+i,
-                              cast(int)ln[1].y+i),
-                state.color.toUI
-            );
+            foreach (int i; 0 .. cast(int)state.lineWidth+2)
+                buf.drawLine(
+                    UIPointI(cast(int)ln[0].x+i,
+                             cast(int)ln[0].y+i),
+                    UIPointI(cast(int)ln[1].x+i,
+                             cast(int)ln[1].y+i),
+                    clr
+                );
         }
             //buf.drawLineF(ln[0].toUI, ln[1].toUI,
             //              state.lineWidth,
@@ -117,13 +153,15 @@ override:
 
     void fill()
     {
-        //if (state.lines.data.length == 0) return;
-        //buf.alpha = cast(uint)(state.color.a * 255);
-        //auto p0 = state.lines.data[0][0];
-        //foreach (ln; state.lines.data[1..$])
-        //    buf.fillTriangleF(p0.toUI, ln[0].toUI,
-        //                     ln[1].toUI, state.color.toUI);
-        //state.lines.clear();
+        if (state.lines.data.length == 0) return;
+        setCurrentState();
+        auto p0 = state.lines.data[0][0];
+        auto clr = state.color.toUI;
+        foreach (ln; state.lines.data[1..$])
+            fillTriangle(p0, ln[0], ln[1], clr);
+            //buf.fillTriangleF(p0.toUI, ln[0].toUI,
+            //                 ln[1].toUI, clr);
+        state.lines.clear();
     }
 
     void moveTo(double x, double y)

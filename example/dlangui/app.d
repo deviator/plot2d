@@ -19,6 +19,8 @@ class PlotWidget : CanvasWidget
     this()
     {
         plot = new Plot;
+        plot.settings.minGridStep.x = 80;
+        plot.settings.minGridStep.y = 80;
         ctx = new DlangUICtx;
 
         auto mf(float i) { return sin(i*sin(i+ct()*0.5)*PI*2); }
@@ -40,7 +42,9 @@ class PlotWidget : CanvasWidget
 
     override void doDraw(DrawBuf buf, Rect rc)
     {
+        buf.fillRect(rc, 0xaaaaaa);
         auto _ = ctx.set(buf);
+        plot.updateCharts();
         plot.draw(ctx, PPoint(this.width, this.height));
     }
 }
