@@ -15,11 +15,15 @@ alias UIPoint = dlangui.PointF;
 alias UIPointI = dlangui.Point;
 alias UIColor = dlangui.Color;
 
+import std.math : floor, ceil;
+
+int floori(double v) { return cast(int)floor(v); }
+
 UIPoint toUI()(auto ref const PPoint p)
 { return UIPoint(p.x, p.y); }
 
 UIPointI toUII()(auto ref const PPoint p)
-{ return UIPointI(cast(int)p.x, cast(int)p.y); }
+{ return UIPointI(floori(p.x), floori(p.y)); }
 
 uint toUI()(auto ref const PColor c)
 {
@@ -82,8 +86,8 @@ protected:
         import std.algorithm : sort;
         auto p = [p0, p1, p2].sort!"a.x < b.x";
         
-        auto d1 = cast(int)(p[1].x - p[0].x);
-        auto d2 = cast(int)(p[2].x - p[1].x);
+        auto d1 = floori(p[1].x) - floori(p[0].x);
+        auto d2 = floori(p[2].x) - floori(p[1].x);
         auto d3 = p[2].x - p[0].x;
 
         foreach (i; 0 .. d1+1)
@@ -92,7 +96,8 @@ protected:
             auto a = (p[0] * (1-fa) + p[1] * fa);
             auto fb = (a.x - p[0].x) / d3;
             auto b = (p[0] * (1-fb) + p[2] * fb);
-            drawLine(a, b, clr);
+            auto x = p[0].x + i;
+            drawLine(PPoint(x, a.y), PPoint(x, b.y), clr);
         }
 
         foreach (i; 0 .. d2+1)
@@ -101,7 +106,8 @@ protected:
             auto a = (p[1] * (1-fa) + p[2] * fa);
             auto fb = (a.x - p[0].x) / d3;
             auto b = (p[0] * (1-fb) + p[2] * fb);
-            drawLine(a, b, clr);
+            auto x = p[1].x + i;
+            drawLine(PPoint(x, a.y), PPoint(x, b.y), clr);
         }
 
     }
@@ -135,16 +141,7 @@ override:
         setCurrentState();
         auto clr = state.color.toUI;
         foreach (ln; state.lines.data)
-        {
-            foreach (int i; 0 .. cast(int)state.lineWidth+2)
-                buf.drawLine(
-                    UIPointI(cast(int)ln[0].x+i,
-                             cast(int)ln[0].y+i),
-                    UIPointI(cast(int)ln[1].x+i,
-                             cast(int)ln[1].y+i),
-                    clr
-                );
-        }
+            drawLine(ln[0], ln[1], clr);
             //buf.drawLineF(ln[0].toUI, ln[1].toUI,
             //              state.lineWidth,
             //              state.color.toUI);
