@@ -4,6 +4,7 @@ import gtk.Main;
 import gtk.Window;
 import gtk.Widget;
 import gtk.DrawingArea;
+import cairo.Context;
 
 import plot2d;
 
@@ -50,10 +51,12 @@ void main(string[] args)
 
     version (with_tre)
     {
-        auto mf(float i) { return sin(i*sin(i+ct()*0.5)*PI*2); }
+        auto sf(float i) { return sin(i*sin(i+ct()*0.5)*PI*2); }
+        auto up(float i) { return 0.4 + sin(i*PI*2+ct*3) * 0.3; }
+        auto down(float i) { return -0.4 - sin(i*PI*3+ct*5) * 0.3; }
         auto tre = iota(-2, 2.02, 0.02)
-            .map!(i=>TreStat(i, mf(i) + 0.4 + sin(i*PI*2+ct*3) * 0.3,
-                            mf(i), mf(i) - 0.4 - sin(i*PI*2+ct*5) * 0.3));
+            .map!(i=>TreStat(i, sf(i) + up(i), sf(i), sf(i) + down(i)));
+
         plot.add(new TreChart(
             Color(0,0.5,0,0.8),
 
