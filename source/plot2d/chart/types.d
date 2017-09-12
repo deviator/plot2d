@@ -16,6 +16,14 @@ const pure nothrow @nogc @safe @property:
     P maxPnt() { return P(tm, max); }
     P minPnt() { return P(tm, min); }
     P valPnt() { return P(tm, val); }
+
+    bool check()
+    {
+        return tm == tm &&
+              max == max &&
+              val == val &&
+              min == min;
+    }
 }
 
 struct BoxStat

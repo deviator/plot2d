@@ -8,6 +8,7 @@ class TreChart : BaseChart!TreStat
 protected:
     override void expandViewport(size_t i, ref const Elem val)
     {
+        if (!val.check) return;
         if (i == 0) vp = Viewport.initial(val.minPnt);
         else
         {
@@ -21,6 +22,7 @@ public:
 
     Color fillUp, fillDown, stroke, strokeLimUp, strokeLimDown;
 
+    bool skipNaN = true;
     double disaster;
     double disasterCoef = 3; // must be > 1
 
@@ -56,14 +58,28 @@ public:
             auto limlinewidth = style.number.get("limlinewidth", 1);
             auto linewidth = style.number.get("linewidth", 2);
 
-            if (buffer.data.length == 0) return;
+            bool fnc(Elem e)
+            {
+                if (skipNaN) return e.check;
+                else return true;
+            }
+
+            auto buf = buffer.data.filter!fnc;
+
+            if (buf.empty) return;
 
             cr.clipViewport(tr.inPadding);
 
-            auto lst = buffer.data.front;
+            auto lst = buf.front;
+            buf.popFront;
 
-            foreach (val; buffer.data[1..$])
+            foreach (val; buf)
             {
+                if (!skipNaN && !(val.check && lst.check))
+                {
+                    lst = val;
+                    continue;
+                }
                 //if (val.tm - lst.tm > disaster)
                 //{ lst = val; continue; }
 
