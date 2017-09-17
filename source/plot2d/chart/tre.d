@@ -6,10 +6,21 @@ public import plot2d.chart.base;
 class TreChart : BaseChart!TreStat
 {
 protected:
-    override void expandViewport(size_t i, ref const Elem val)
+    override void expandViewport(ref const Elem val, ref bool inited)
     {
+        if (val.tm == val.tm)
+        {
+            import plot2d.util;
+            vp.w.min.set!min(val.tm);
+            vp.w.max.set!max(val.tm);
+        }
         if (!val.check) return;
-        if (i == 0) vp = Viewport.initial(val.minPnt);
+        if (!inited)
+        {
+            vp.h.min = val.min;
+            vp.h.max = val.max;
+            inited = true;
+        }
         else
         {
             vp.expand(val.minPnt);

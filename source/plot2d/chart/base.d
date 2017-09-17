@@ -29,7 +29,7 @@ protected:
     Appender!(Elem[]) buffer;
     BufferFiller fillData;
 
-    void expandViewport(size_t i, ref const Elem val);
+    abstract void expandViewport(ref const Elem val, ref bool inited);
 
 public:
 
@@ -58,8 +58,9 @@ public:
             return;
         }
 
-        foreach (i, ref const t; buffer.data)
-            expandViewport(i, t);
+        bool inited;
+        foreach (ref const t; buffer.data)
+            expandViewport(t, inited);
     }
 
     ///
