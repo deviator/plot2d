@@ -103,6 +103,7 @@ public:
                 if (verticalCap)
                 {
                     if (!lst.check && val.check) vcap(val);
+                    else
                     if (lst.check && !val.check) vcap(lst);
                 }
 
