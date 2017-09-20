@@ -94,7 +94,7 @@ public:
                 cr.setLineWidth(linewidth);    
                 cr.setColor(stroke);
                 cr.lineP2P(tr.toDA(p.valPnt)-Point(1,0),
-                            tr.toDA(p.valPnt)+Point(1,0));
+                           tr.toDA(p.valPnt)+Point(1,0));
                 cr.stroke();
             }
 
