@@ -141,10 +141,10 @@ override:
         setCurrentState();
         auto clr = state.color.toUI;
         foreach (ln; state.lines.data)
-            drawLine(ln[0], ln[1], clr);
-            //buf.drawLineF(ln[0].toUI, ln[1].toUI,
-            //              state.lineWidth,
-            //              state.color.toUI);
+            //drawLine(ln[0], ln[1], clr);
+            buf.drawLineF(ln[0].toUI, ln[1].toUI,
+                          state.lineWidth,
+                          state.color.toUI);
         state.lines.clear();
     }
 
@@ -155,9 +155,9 @@ override:
         auto p0 = state.lines.data[0][0];
         auto clr = state.color.toUI;
         foreach (ln; state.lines.data[1..$])
-            fillTriangle(p0, ln[0], ln[1], clr);
-            //buf.fillTriangleF(p0.toUI, ln[0].toUI,
-            //                 ln[1].toUI, clr);
+            //fillTriangle(p0, ln[0], ln[1], clr);
+            buf.fillTriangleF(p0.toUI, ln[0].toUI,
+                             ln[1].toUI, clr);
         state.lines.clear();
     }
 

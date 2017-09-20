@@ -69,13 +69,7 @@ public:
             auto limlinewidth = style.number.get("limlinewidth", 1);
             auto linewidth = style.number.get("linewidth", 2);
 
-            bool fnc(Elem e)
-            {
-                if (skipNaN) return e.check;
-                else return true;
-            }
-
-            auto buf = buffer.data.filter!fnc;
+            auto buf = buffer.data.filter!(a=>skipNaN?a.check:true);
 
             if (buf.empty) return;
 
@@ -86,6 +80,24 @@ public:
 
             foreach (val; buf)
             {
+                if (!lst.check)
+                {
+                    cr.setLineWidth(limlinewidth);
+                    cr.setColor(strokeLimUp);
+                    cr.lineP2P(tr.toDA(val.valPnt), tr.toDA(val.maxPnt));
+                    cr.stroke();
+
+                    cr.setColor(strokeLimDown);
+                    cr.lineP2P(tr.toDA(val.valPnt), tr.toDA(val.minPnt));
+                    cr.stroke();
+
+                    cr.setLineWidth(linewidth);    
+                    cr.setColor(stroke);
+                    cr.lineP2P(tr.toDA(val.valPnt)-Point(1,0),
+                               tr.toDA(val.valPnt)+Point(1,0));
+                    cr.stroke();
+                }
+
                 if (!skipNaN && !(val.check && lst.check))
                 {
                     lst = val;

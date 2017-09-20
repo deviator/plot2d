@@ -85,10 +85,13 @@ class Ex1 : ChartWH
             auto sf(float i) { return sin(i*sin(i+ct()*0.5)*PI*2); }
             auto up(float i) { return 0.4 + sin(i*PI*2+ct*3) * 0.3; }
             auto down(float i) { return -0.4 - sin(i*PI*3+ct*5) * 0.3; }
+            enum nan = double.nan;
             auto tre = iota(-2, 2.02, 0.02)
-                .map!(i=>TreStat(i, sf(i) + up(i), sf(i), sf(i) + down(i)));
+                .map!(i=>TreStat(i, sf(i) + up(i), sf(i), sf(i) + down(i)))
+                .enumerate.map!(t=>(t[1].tm>0.2&&t[1].tm<0.5)?
+                    (t[0]%2?t[1]:TreStat(t[1].tm, nan, nan, nan)):t[1]);
 
-            plot.add(new TreChart(
+            auto plt = plot.add(new TreChart(
                 Color(0,0.5,0,0.8),
 
                 Color(1,1,0,.3),
@@ -98,6 +101,7 @@ class Ex1 : ChartWH
                 Color(0,1,1,.2),
                 (ref Appender!(TreStat[]) buf) { buf.put(tre.save); }
             ));
+            plt.skipNaN = false;
         }
     }
 }
