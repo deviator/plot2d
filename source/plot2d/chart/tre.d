@@ -34,6 +34,8 @@ public:
     Color fillUp, fillDown, stroke, strokeLimUp, strokeLimDown;
 
     bool skipNaN = true;
+    bool verticalCap = true;
+
     double disaster;
     double disasterCoef = 3; // must be > 1
 
@@ -78,24 +80,30 @@ public:
             auto lst = buf.front;
             buf.popFront;
 
+            void vcap(typeof(lst) p)
+            {
+                cr.setLineWidth(limlinewidth);
+                cr.setColor(strokeLimUp);
+                cr.lineP2P(tr.toDA(p.valPnt), tr.toDA(p.maxPnt));
+                cr.stroke();
+
+                cr.setColor(strokeLimDown);
+                cr.lineP2P(tr.toDA(p.valPnt), tr.toDA(p.minPnt));
+                cr.stroke();
+
+                cr.setLineWidth(linewidth);    
+                cr.setColor(stroke);
+                cr.lineP2P(tr.toDA(p.valPnt)-Point(1,0),
+                            tr.toDA(p.valPnt)+Point(1,0));
+                cr.stroke();
+            }
+
             foreach (val; buf)
             {
-                if (!lst.check)
+                if (verticalCap)
                 {
-                    cr.setLineWidth(limlinewidth);
-                    cr.setColor(strokeLimUp);
-                    cr.lineP2P(tr.toDA(val.valPnt), tr.toDA(val.maxPnt));
-                    cr.stroke();
-
-                    cr.setColor(strokeLimDown);
-                    cr.lineP2P(tr.toDA(val.valPnt), tr.toDA(val.minPnt));
-                    cr.stroke();
-
-                    cr.setLineWidth(linewidth);    
-                    cr.setColor(stroke);
-                    cr.lineP2P(tr.toDA(val.valPnt)-Point(1,0),
-                               tr.toDA(val.valPnt)+Point(1,0));
-                    cr.stroke();
+                    if (!lst.check && val.check) vcap(val);
+                    if (lst.check && !val.check) vcap(lst);
                 }
 
                 if (!skipNaN && !(val.check && lst.check))
