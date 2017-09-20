@@ -5,12 +5,12 @@ public import plot2d.chart.base;
 class BoxChart : BaseChart!BoxStat
 {
 protected:
-    override void expandViewport(ref const Elem val, ref bool inited)
+    override void expandViewport(ref const Elem val, ref bool[2] inited)
     {
-        if (inited)
+        if (inited[0])
         {
             vp = Viewport.initial(Point(val.tm - val.dtm/2, val.min));
-            inited = true;
+            inited[0] = true;
         }
         else
         {

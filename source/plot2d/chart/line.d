@@ -6,12 +6,12 @@ import plot2d.chart.base;
 class LineChart : BaseChart!Point
 {
 protected:
-    override void expandViewport(ref const Elem val, ref bool inited)
+    override void expandViewport(ref const Elem val, ref bool[2] inited)
     {
-        if (!inited)
+        if (!inited[0])
         {
             vp = Viewport.initial(val);
-            inited = true;
+            inited[0] = true;
         }
         else vp.expand(val);
     }
