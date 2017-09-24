@@ -38,6 +38,10 @@ class PlotWidget : CanvasWidget
             PColor(0,1,1,.2),
             (ref Appender!(TreStat[]) buf) { buf.put(tre.save); }
         ));
+
+        plot.settings.viewport = Viewport(DimSeg(-2,2), DimSeg(-1, 2));
+        plot.settings.autoFit = false;
+        plot.settings.padding = Border(0);
     }
 
     override void doDraw(DrawBuf buf, Rect rc)

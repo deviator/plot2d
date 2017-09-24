@@ -58,8 +58,8 @@ protected:
 
     void setCurrentState()
     {
-        //buf.resetClipping();
-        //buf.clipRect = state.clip;
+        buf.resetClipping();
+        buf.clipRect = state.clip;
         buf.alpha = cast(uint)(state.color.a * 255);
     }
 
@@ -78,10 +78,10 @@ protected:
 
     DrawBuf buf;
 
-    void drawLine(PPoint a, PPoint b, int c)
+    void drawLineSoft(PPoint a, PPoint b, int c)
     { buf.drawLine(a.toUII, b.toUII, c); }
 
-    void fillTriangle(PPoint p0, PPoint p1, PPoint p2, int clr)
+    void fillTriangleSoft(PPoint p0, PPoint p1, PPoint p2, int clr)
     {
         import std.algorithm : sort;
         auto p = [p0, p1, p2].sort!"a.x < b.x";
@@ -97,7 +97,7 @@ protected:
             auto fb = (a.x - p[0].x) / d3;
             auto b = (p[0] * (1-fb) + p[2] * fb);
             auto x = p[0].x + i;
-            drawLine(PPoint(x, a.y), PPoint(x, b.y), clr);
+            drawLineSoft(PPoint(x, a.y), PPoint(x, b.y), clr);
         }
 
         foreach (i; 0 .. d2+1)
@@ -107,9 +107,8 @@ protected:
             auto fb = (a.x - p[0].x) / d3;
             auto b = (p[0] * (1-fb) + p[2] * fb);
             auto x = p[1].x + i;
-            drawLine(PPoint(x, a.y), PPoint(x, b.y), clr);
+            drawLineSoft(PPoint(x, a.y), PPoint(x, b.y), clr);
         }
-
     }
 
 public:
@@ -117,7 +116,7 @@ public:
     StackReseter set(DrawBuf buf)
     {
         this.buf = buf;
-        //state.clip = buf.clipRect;
+        state.clip = buf.clipRect;
         return StackReseter(this);
     }
 
@@ -141,7 +140,7 @@ override:
         setCurrentState();
         auto clr = state.color.toUI;
         foreach (ln; state.lines.data)
-            //drawLine(ln[0], ln[1], clr);
+            //drawLineSoft(ln[0], ln[1], clr);
             buf.drawLineF(ln[0].toUI, ln[1].toUI,
                           state.lineWidth,
                           state.color.toUI);
@@ -155,7 +154,7 @@ override:
         auto p0 = state.lines.data[0][0];
         auto clr = state.color.toUI;
         foreach (ln; state.lines.data[1..$])
-            //fillTriangle(p0, ln[0], ln[1], clr);
+            //fillTriangleSoft(p0, ln[0], ln[1], clr);
             buf.fillTriangleF(p0.toUI, ln[0].toUI,
                              ln[1].toUI, clr);
         state.lines.clear();
@@ -174,24 +173,24 @@ override:
 
     void showText(string str)
     {
-        //auto p = state.position;
-        //Glyph g;
-        //g.blackBoxX = 10;
-        //g.blackBoxY = 15;
-        //g.originX = 0;
-        //g.originY = 0;
-        //g.width = 10;
-        //auto hh = 15;
-        //g.glyph.length = g.width * hh;
-        //foreach (i; 0..hh)
-        //    foreach (j; 0 .. g.width)
-        //    {
-        //        if (i == j || g.width - i == j)
-        //            g.glyph[i*g.width + j] = 1;
-        //    }
-        //foreach (c; str)
-        //    buf.drawGlyph(cast(int)p.x, cast(int)p.y, &g,
-        //                    UIColor.red);
+        // TODO
+        auto p = state.position;
+        Glyph g;
+        g.blackBoxX = 10;
+        g.blackBoxY = 15;
+        g.originX = 0;
+        g.originY = 0;
+        g.width = 10;
+        auto hh = 15;
+        g.glyph.length = g.width * hh;
+        foreach (i; 0..hh) foreach (j; 0..g.width)
+        {
+            if (i == j || g.width - i == j)
+                g.glyph[i*g.width + j] = 1;
+        }
+        foreach (c; str)
+            buf.drawGlyph(cast(int)p.x, cast(int)p.y, &g,
+                            UIColor.red);
     }
 
     void setDash(double[] dash, double offset)
@@ -217,11 +216,11 @@ override:
 
     void clipViewport(Viewport vp)
     {
-        //state.clip = Rect(cast(int)vp.w.min,
-        //                  cast(int)vp.h.min,
-        //                  cast(int)vp.w.max,
-        //                  cast(int)vp.h.max);
-        //buf.clipRect = state.clip;
-        //state.clip = buf.clipRect;
+        state.clip = Rect(cast(int)vp.w.min,
+                          cast(int)vp.h.min,
+                          cast(int)vp.w.max,
+                          cast(int)vp.h.max);
+        buf.clipRect = state.clip;
+        state.clip = buf.clipRect;
     }
 }
