@@ -9,7 +9,7 @@ interface ValueHandler(Key, Value)
     ///
     Value opIndex(Key);
     ///
-    void opIndexAssign(Key, Value);
+    void opIndexAssign(Value, Key);
     ///
     Value get(Key, lazy Value);
     ///
@@ -105,11 +105,11 @@ protected:
             else return data.get(p, defaultValue);
         }
         ///
-        void opIndexAssign(string p, Value val)
+        void opIndexAssign(Value val, string p)
         {
             if (this.outer.parent !is null)
                 mixin("this.outer.parent."~fld~
-                        ".opIndexAssign(trName(p), val);");
+                        ".opIndexAssign(val, trName(p));");
             else data[p] = val;
         }
         ///
