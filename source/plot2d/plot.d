@@ -1,7 +1,7 @@
 ///
 module plot2d.plot;
 
-import std.datetime : StopWatch;
+import std.datetime.stopwatch;
 
 import std.stdio;
 
