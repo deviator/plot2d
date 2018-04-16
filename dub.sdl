@@ -8,7 +8,7 @@ license "MIT"
 
 configuration "gtk" {
     versions "cairo"
-    dependency "gtk-d:gtkd" version="~>3.7.1"
+    dependency "gtk-d:gtkd" version="~>3.8.0"
 }
 
 configuration "dlangui" {
