@@ -180,13 +180,13 @@ override:
         g.blackBoxY = 15;
         g.originX = 0;
         g.originY = 0;
-        g.width = 10;
+        g.widthPixels = 10;
         auto hh = 15;
-        g.glyph.length = g.width * hh;
-        foreach (i; 0..hh) foreach (j; 0..g.width)
+        g.glyph.length = g.widthPixels * hh;
+        foreach (i; 0..hh) foreach (j; 0..g.widthPixels)
         {
-            if (i == j || g.width - i == j)
-                g.glyph[i*g.width + j] = 1;
+            if (i == j || g.widthPixels - i == j)
+                g.glyph[i*g.widthPixels + j] = 1;
         }
         foreach (c; str)
             buf.drawGlyph(cast(int)p.x, cast(int)p.y, &g,
