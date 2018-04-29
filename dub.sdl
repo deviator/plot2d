@@ -13,5 +13,5 @@ configuration "gtk" {
 
 configuration "dlangui" {
     versions "dlangui"
-    dependency "dlangui" version="~>0.9.120"
+    dependency "dlangui" version="~>0.9.177"
 }
